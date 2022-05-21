@@ -4,9 +4,8 @@ const process = require('process')
 const port = +process.argv[2] || 3000
 const client = require('redis').createClient()
 
-const ASSIGNED_CARDS_SETUP = {
-    start: null, end: null,
-}
+let START;
+let END;
 const cards = fs.readJsonSync('./cards.json').map((card) =>
     Buffer.from(`{"id": "${card.id}", "name": "${card.name}"}`)
 );
@@ -24,25 +23,25 @@ const prepareServer = async () => {
 
     console.log(`Process #${process.pid} was assigned to index #${index}`);
     if (index === 0) {
-        ASSIGNED_CARDS_SETUP.end = cards.length - 1;
-        ASSIGNED_CARDS_SETUP.start = ASSIGNED_CARDS_SETUP.end - cardsAssignmentCount;
+        END = cards.length;
+        START = END - cardsAssignmentCount + 1;
     } else {
-        ASSIGNED_CARDS_SETUP.end = cards.length - cardsAssignmentCount - 1;
-        ASSIGNED_CARDS_SETUP.start = ASSIGNED_CARDS_SETUP.end - cardsAssignmentCount;
+        END = cards.length - cardsAssignmentCount;
+        START = END - cardsAssignmentCount + 1;
     }
 }
 
 const onRequest = async (req, res) => {
     res.statusCode = 200;
-    let user = users[req.url]
+    let user = users[req.url] ++
     if (user) {
-        res.end(getCard(req.url, user))
-    } else {
-        user = users[req.url] = {
-            current: ASSIGNED_CARDS_SETUP.start,
-            target: ASSIGNED_CARDS_SETUP.end
+        if (user < END) {
+            return res.end(cards[user]);
         }
-        res.end(cards[user.current += 1])
+        return res.end(cardsDone)
+    } else {
+        users[req.url] = START
+        return res.end(cards[START - 1])
     }
 }
 
@@ -54,14 +53,6 @@ const onRedisReady = async () => {
 
 const onRedisError = (error) => {
     console.log(`Process #${process.pid} Redis Client Error`, error);
-}
-
-const getCard = (user_id, user) => {
-    if (user.current < user.target) {
-        return cards[user.current += 1];
-    } else {
-        return cardsDone
-    }
 }
 
 client.on('error', onRedisError).on('ready', onRedisReady);
