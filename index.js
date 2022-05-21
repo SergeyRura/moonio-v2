@@ -1,15 +1,15 @@
 const fs = require('fs-extra');
-const turbo = require('turbo-http')
-const process = require('process')
-const port = +process.argv[2] || 3000
-const client = require('redis').createClient()
+const turbo = require('turbo-http');
+const process = require('process');
+const port = +process.argv[2] || 3000;
+const client = require('redis').createClient();
 
 let START;
 let END;
 const cards = fs.readJsonSync('./cards.json').map((card) =>
     Buffer.from(`{"id": "${card.id}", "name": "${card.name}"}`)
 );
-const cardsDone = Buffer.from(`{"id": "ALL CARDS"}`)
+const cardsDone = Buffer.from(`{"id": "ALL CARDS"}`);
 const users = {};
 
 const prepareServer = async () => {
@@ -33,22 +33,22 @@ const prepareServer = async () => {
 
 const onRequest = async (req, res) => {
     res.statusCode = 200;
-    let user = users[req.url] ++
+    let user = users[req.url] ++;
     if (user) {
         if (user < END) {
             return res.end(cards[user]);
         }
-        return res.end(cardsDone)
+        return res.end(cardsDone);
     } else {
-        users[req.url] = START
-        return res.end(cards[START - 1])
+        users[req.url] = START;
+        return res.end(cards[START - 1]);
     }
 }
 
 const onRedisReady = async () => {
     await prepareServer();
-    const server = turbo.createServer(onRequest)
-    server.listen(port)
+    const server = turbo.createServer(onRequest);
+    server.listen(port);
 }
 
 const onRedisError = (error) => {
