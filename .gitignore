@@ -2,3 +2,5 @@ cards.json
 osx-intel
 node_modules
 .idea
+tester_src
+tester*

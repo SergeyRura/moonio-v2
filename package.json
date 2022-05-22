@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "fs-extra": "^10.1.0",
-    "redis": "^4.0.1",
     "http-parser-js": "^0.4.11",
+    "redis": "^4.0.1",
     "turbo-net": "^1.4.0"
   }
 }
