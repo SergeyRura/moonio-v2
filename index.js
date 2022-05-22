@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const turbo = require('turbo-http');
+const turbo = require('./http/index');
 const process = require('process');
 const port = +process.argv[2] || 3000;
 const client = require('redis').createClient();
@@ -35,13 +35,14 @@ const onRequest = async (req, res) => {
     res.statusCode = 200;
     let user = users[req.url] ++;
     if (user) {
-        if (user < END) {
-            return res.end(cards[user]);
-        }
-        return res.end(cardsDone);
+        const card = user < END ? cards[user] : cardsDone
+        res.setHeader('Content-Length', card.length)
+        res.write(card)
     } else {
         users[req.url] = START;
-        return res.end(cards[START - 1]);
+        const card = cards[START - 1]
+        res.setHeader('Content-Length', card.length)
+        res.write(card)
     }
 }
 

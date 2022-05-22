@@ -12,6 +12,7 @@
   "dependencies": {
     "fs-extra": "^10.1.0",
     "redis": "^4.0.1",
-    "turbo-http": "^0.3.2"
+    "http-parser-js": "^0.4.11",
+    "turbo-net": "^1.4.0"
   }
 }
