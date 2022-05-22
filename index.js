@@ -32,7 +32,6 @@ const prepareServer = async () => {
 }
 
 const onRequest = async (req, res) => {
-    res.statusCode = 200;
     let user = users[req.url] ++;
     if (user) {
         const card = user < END ? cards[user] : cardsDone
