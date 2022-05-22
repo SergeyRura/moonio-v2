@@ -1,8 +1,6 @@
-const { HTTPParser } = require('http-parser-js')
 
 class Request {
   constructor (socket, opts) {
-    this.method = HTTPParser.methods[opts.method]
     this.url = opts.url
     this.socket = socket
 

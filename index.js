@@ -22,7 +22,7 @@ const prepareServer = async () => {
     const identifier = process.pid.toString();
     await client.RPUSH(servicesKey, identifier);
 
-    await wait(500);
+    await wait(1000);
     const cardsCount = cards.length;
     const services = await client.LRANGE(servicesKey, 0, -1);
     const index = services.indexOf(identifier);
